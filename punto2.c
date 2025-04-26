@@ -24,6 +24,10 @@ void PedirDuracion(Nodo * NNodo);
 void InsertarNodo(Nodo ** Start , Nodo *Nodo);
 Nodo * QuitarNodo(Nodo **Start, int dato);
 void MostrarLista(Nodo **Start);
+Nodo* ConsultarTareaID(Nodo **Start, int dato);
+Nodo* ConsultarTareaPalabraClave(Nodo **Start, char* dato);
+void MostrarTarea(Nodo *Nodo);
+
 
 int main(){
 
@@ -31,7 +35,7 @@ int main(){
     TareasPendientes = CrearListaVacia();
     Nodo * TareasRealizadas;
     TareasRealizadas = CrearListaVacia();
-    int id = 1000, opcion=0;
+    int id = 1000, opcion=0, seleccion = 1; ;
     do{
         printf("\n\n[1] Ingresar tareas");
         printf("\n[2] Trasferir tareas pendientes a realizadas");
@@ -43,7 +47,7 @@ int main(){
         switch (opcion)
         {
             case 1:      
-                int seleccion = 1;                       
+                                      
                 do{              
                    InsertarNodo(&TareasPendientes , CrearNodo(id));
                    id++;
@@ -82,7 +86,56 @@ int main(){
                 printf("\n...........TAREAS REALIZADAS..........");
                 MostrarLista(&TareasRealizadas);
                 break;
-
+            
+            case 4:
+                
+                do{
+                    printf("\n[1]Buscar tarea por ID");
+                    printf("\n[2]Buscar tarea por PALABRA CLAVE");
+                    printf("\n\nIngrese una opcion: ");
+                    scanf("%d", &seleccion);
+                }while(seleccion<1 || seleccion>2);
+                
+                if(seleccion == 1){
+                    int idBuscado;
+                    printf("Ingrese el ID:");
+                    scanf("%d", &idBuscado);
+                    Nodo * Buscado1; //Elemento buscado en la lista de tareas pendientes
+                    Nodo * Buscado2; //Elemento buscado en la lista de tareas realizadas
+                    if((Buscado1 = ConsultarTareaID(&TareasPendientes, idBuscado)) || (Buscado2 = ConsultarTareaID(&TareasRealizadas, idBuscado)) ){
+                        if(Buscado1){
+                            printf("--- TAREA PENDIENTE ---");
+                            MostrarTarea(Buscado1);
+                        }else{
+                            printf("--- TAREA REALIZADA ---");
+                            MostrarTarea(Buscado2);
+                        }                  
+                    }
+                    else{
+                        printf("\nTarea NO existente");
+                    }
+                    
+                }else{
+                    char clave[50];
+                    printf("Ingrese la PALABRE CLAVE:");
+                    fflush(stdin);
+                    scanf("%s", clave);
+                    Nodo * Buscado1; //Elemento buscado en la lista de tareas pendientes
+                    Nodo * Buscado2; //Elemento buscado en la lista de tareas realizadas
+                    if((Buscado1 = ConsultarTareaPalabraClave(&TareasPendientes, clave)) || (Buscado2 = ConsultarTareaPalabraClave(&TareasRealizadas, clave)) ){
+                        if(Buscado1){
+                            printf("--- TAREA PENDIENTE ---");
+                            MostrarTarea(Buscado1);
+                        }else{
+                            printf("--- TAREA REALIZADA ---");
+                            MostrarTarea(Buscado2);
+                        }                  
+                    }else{
+                        printf("\nTarea NO existente");
+                    }
+                }
+                
+                break;
            
             default:
                 printf("\nOpcion incorrecta, vuelva a intentar");
@@ -93,6 +146,7 @@ int main(){
 
     return 0;
 }
+
 
 void InsertarNodo(Nodo ** Start , Nodo *Nodo)
 {
@@ -164,3 +218,30 @@ void MostrarLista(Nodo **Start){
       Aux = Aux->Siguiente;
     }
 }
+
+void MostrarTarea(Nodo *Nodo){
+    printf("\n_ Tarea %d _", Nodo->T.TareaID);
+    printf("\nDescripcion: %s", Nodo->T.Descripcion);
+    printf("\nDuracion: %d\n", Nodo->T.Duracion);
+}
+
+Nodo* ConsultarTareaID(Nodo **Start, int dato){
+    Nodo * Aux = *Start;
+    while (Aux && Aux->T.TareaID != dato)
+    {
+      Aux = Aux->Siguiente;
+    }
+    return Aux;
+}
+
+Nodo* ConsultarTareaPalabraClave(Nodo **Start, char* dato){
+    Nodo * Aux = *Start;
+    while(Aux){
+        if (strstr(Aux->T.Descripcion, dato) != NULL){
+            return Aux;
+        }
+        Aux = Aux->Siguiente;
+    }
+    return NULL;
+}
+
