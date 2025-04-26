@@ -22,6 +22,8 @@ Nodo * CrearNodo(int id);
 void PedirDescripcion(Nodo *NNodo);    
 void PedirDuracion(Nodo * NNodo);
 void InsertarNodo(Nodo ** Start , Nodo *Nodo);
+Nodo * QuitarNodo(Nodo **Start, int dato);
+void MostrarLista(Nodo **Start);
 
 int main(){
 
@@ -29,16 +31,65 @@ int main(){
     TareasPendientes = CrearListaVacia();
     Nodo * TareasRealizadas;
     TareasRealizadas = CrearListaVacia();
-    int seleccion, id = 1000;
+    int id = 1000, opcion=0;
     do{
-         printf("\nCrear nueva tarea? 0:NO, 1:SI ");
-         scanf("%d",&seleccion);
-         if(seleccion == 1){
-            InsertarNodo(&TareasPendientes , CrearNodo(id));
-            id++;
-         }
-         printf("\n");
-    }while(seleccion != 0);
+        printf("\n\n[1] Ingresar tareas");
+        printf("\n[2] Trasferir tareas pendientes a realizadas");
+        printf("\n[3] Listar tareas");
+        printf("\n[4] Consultar tarea por id o palabra clave");
+        printf("\n[5] Salir");
+        printf("\n\nIngrese una opcion:");
+        scanf("%d",&opcion);
+        switch (opcion)
+        {
+            case 1:      
+                int seleccion = 1;                       
+                do{              
+                   InsertarNodo(&TareasPendientes , CrearNodo(id));
+                   id++;
+                   printf("\nTarea ingresada correctamente...");            
+                   printf("\nCrear nueva tarea? 0:NO, 1:SI ");
+                   fflush(stdin);
+                   scanf("%d",&seleccion);                  
+                   printf("\n");
+                }while(seleccion == 1); 
+
+                break;
+                
+            case 2:
+                int idBuscado;
+                do{
+                    printf("Ingrese ID de la tarea pendiente que completo: ");
+                    scanf("%d", &idBuscado);
+                    Nodo* Buscado = QuitarNodo(&TareasPendientes, idBuscado);              
+                    if(Buscado)
+                    {
+                        InsertarNodo(&TareasRealizadas , Buscado); 
+                        printf("\nTarea %d transferida a la lista de realizadas", idBuscado);
+                    }else{
+                        printf("\nTarea %d no encontrada en pendiente");
+                    }
+                    printf("\nTrasferir otra tarea? 0:NO, 1:SI ");
+                    scanf("%d",&seleccion);
+                }while(seleccion == 1); 
+
+                break;
+
+
+            case 3:
+                printf("\n...........TAREAS PENDIENTES..........");
+                MostrarLista(&TareasPendientes);
+                printf("\n...........TAREAS REALIZADAS..........");
+                MostrarLista(&TareasRealizadas);
+                break;
+
+           
+            default:
+                printf("\nOpcion incorrecta, vuelva a intentar");
+                break;
+        }
+    }while(opcion !=5);
+    
 
     return 0;
 }
@@ -69,9 +120,9 @@ void PedirDescripcion(Nodo * NNodo)
 {
     char cadenaAux[500];
     printf("\n\n------ TAREA %d ------",NNodo->T.TareaID);
+    fflush(stdin);
     printf("\nDescripcion: ");
-    getchar();
-    scanf("%s",cadenaAux);
+    gets(cadenaAux);
     NNodo->T.Descripcion = (char *)malloc(strlen(cadenaAux) + 1);
     strcpy(NNodo->T.Descripcion, cadenaAux);
 }
@@ -83,4 +134,33 @@ void PedirDuracion(Nodo * NNodo)
         fflush(stdin);
         scanf("%d",&(NNodo->T.Duracion));
     }while(NNodo->T.Duracion<10 || NNodo->T.Duracion>100);
+}
+
+Nodo * QuitarNodo(Nodo **Start, int dato) {
+    Nodo ** aux = Start;  // Usamos un puntero doble para apuntar al puntero actual.
+    
+    // Iteramos sobre la lista hasta encontrar el dato o alcanzar el final de la lista.
+    while (*aux != NULL && (*aux)->T.TareaID != dato) {
+        aux = &(*aux)->Siguiente;
+    }
+
+    // Si encontramos el nodo con el dato especificado, lo quitamos de la lista y retornamos al programa para su posterior eliminación.
+    if (*aux) {
+        Nodo *temp = *aux;  // Guardamos el nodo a eliminar en una variable temporal.
+        *aux = (*aux)->Siguiente;  // Desvinculamos el nodo de la lista.
+        temp->Siguiente =NULL; // Ponemos en NULL el puntero siguiente para asegura no llevar vinculos por fuera de la lista
+        return temp;
+    }
+    return NULL;
+}
+
+void MostrarLista(Nodo **Start){
+    Nodo * Aux = *Start;
+     while (Aux)
+    {
+      printf("\n\n_ TAREA %d _",Aux->T.TareaID);
+      printf("\nDescripcion: %s", Aux->T.Descripcion);
+      printf("\nDuracion: %d\n", Aux->T.Duracion);
+      Aux = Aux->Siguiente;
+    }
 }
