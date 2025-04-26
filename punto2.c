@@ -27,6 +27,7 @@ void MostrarLista(Nodo **Start);
 Nodo* ConsultarTareaID(Nodo **Start, int dato);
 Nodo* ConsultarTareaPalabraClave(Nodo **Start, char* dato);
 void MostrarTarea(Nodo *Nodo);
+void LiberarLista(Nodo **Start);
 
 
 int main(){
@@ -104,17 +105,17 @@ int main(){
                     Nodo * Buscado2; //Elemento buscado en la lista de tareas realizadas
                     if((Buscado1 = ConsultarTareaID(&TareasPendientes, idBuscado)) || (Buscado2 = ConsultarTareaID(&TareasRealizadas, idBuscado)) ){
                         if(Buscado1){
-                            printf("--- TAREA PENDIENTE ---");
+                            printf("\n--- TAREA PENDIENTE ---");
                             MostrarTarea(Buscado1);
                         }else{
-                            printf("--- TAREA REALIZADA ---");
+                            printf("\n--- TAREA REALIZADA ---");
                             MostrarTarea(Buscado2);
                         }                  
                     }
                     else{
                         printf("\nTarea NO existente");
                     }
-                    
+
                 }else{
                     char clave[50];
                     printf("Ingrese la PALABRE CLAVE:");
@@ -124,10 +125,10 @@ int main(){
                     Nodo * Buscado2; //Elemento buscado en la lista de tareas realizadas
                     if((Buscado1 = ConsultarTareaPalabraClave(&TareasPendientes, clave)) || (Buscado2 = ConsultarTareaPalabraClave(&TareasRealizadas, clave)) ){
                         if(Buscado1){
-                            printf("--- TAREA PENDIENTE ---");
+                            printf("\n--- TAREA PENDIENTE ---");
                             MostrarTarea(Buscado1);
                         }else{
-                            printf("--- TAREA REALIZADA ---");
+                            printf("\n--- TAREA REALIZADA ---");
                             MostrarTarea(Buscado2);
                         }                  
                     }else{
@@ -135,14 +136,20 @@ int main(){
                     }
                 }
                 
-                break;
+            break;
+
+            case 5:
+                printf("\nSaliendo...");
+               break;
            
             default:
                 printf("\nOpcion incorrecta, vuelva a intentar");
                 break;
         }
-    }while(opcion !=5);
+    }while(opcion<1  || opcion>5);
     
+    LiberarLista(&TareasPendientes);
+    LiberarLista(&TareasRealizadas);
 
     return 0;
 }
@@ -245,3 +252,21 @@ Nodo* ConsultarTareaPalabraClave(Nodo **Start, char* dato){
     return NULL;
 }
 
+void LiberarLista(Nodo **Start) {
+    Nodo *actual = *Start;
+    Nodo *siguiente;
+
+    while (actual != NULL) {
+        siguiente = actual->Siguiente;  
+        
+        // Liberamos la descripción solo si fue asignada
+        if (actual->T.Descripcion != NULL) {
+            free(actual->T.Descripcion);
+        }
+        
+        free(actual);     
+        actual = siguiente; 
+    }
+
+    *Start = NULL; 
+}
